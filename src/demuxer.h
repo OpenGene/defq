@@ -6,6 +6,7 @@
 #include <string>
 #include "options.h"
 #include "read.h"
+#include <map>
 
 using namespace std;
 
@@ -31,6 +32,8 @@ private:
     bool mHasN;
     bool mFastMode;
     int mLongestIndex;
+    int mShortestIndex;
+    map<string, int> mIndexSample;
 
 };
 

@@ -34,6 +34,10 @@ void Demuxer::init() {
         if(contains(s.index1, 'N') || contains(s.index2, 'N'))
             mHasN = true;
 
+        if(s.index1.empty() && s.index2.empty()) {
+            error_exit("bad format sample sheet. You should specify either index1 or index2 for each record");
+        }
+
         if(s.index1.length() > mLongestIndex)
             mLongestIndex = s.index1.length();
         if(s.index2.length() > mLongestIndex)
@@ -45,14 +49,18 @@ void Demuxer::init() {
             if(mOptions->samples[i].index2.length() != mOptions->samples[i-1].index2.length())
                 sameLength = false;
         }
-        cout << s.file << " = " << s.index1 << "," << s.index2 << endl;
+        cout << "file (" << s.file << ") = " << s.index1 << "," << s.index2 << endl;
     }
 
     mFastMode = true;
-    if(mUseIndex1 && mUseIndex2)
+    if(mUseIndex1 && mUseIndex2) {
         mFastMode = false;
-    if(mHasN)
+        error_exit("bad format sample sheet. You can use either index1 or index2, but cannot use both.");
+    }
+    if(mHasN) {
         mFastMode = false;
+        error_exit("bad format sample sheet. N base is not supported.");
+    }
     if(!sameLength)
         mFastMode = false;
     if(mLongestIndex > 14)
@@ -79,7 +87,19 @@ void Demuxer::init() {
             mBuf[kmer] = i;
         }
     } else {
-        error_exit("bad format sample sheet. Only index1/index2 can be used, and all indexes should have same length, shorter than 15 bp and without N.");
+        mShortestIndex = mLongestIndex;
+        for(int i=0; i<mOptions->samples.size(); i++) {
+            Sample s = mOptions->samples[i];
+            string index;
+            if(mUseIndex1)
+                index = s.index1;
+            else
+                index = s.index2;
+            if(index.length() < mShortestIndex)
+                mShortestIndex = index.length();
+
+            mIndexSample[index] = i;
+        }
     }
 }
 
@@ -90,15 +110,34 @@ int Demuxer::demux(Read* r) {
     else if(mUseIndex2)
         index = r->lastIndex();
 
-    // return the Undetermined one
-    if(index.length() != mLongestIndex)
-        return -1;
+    if(mFastMode) {
+        // return the Undetermined one
+        if(index.length() < mLongestIndex)
+            return -1;
+        else if(index.length() > mLongestIndex)
+            index = index.substr(0, mLongestIndex);
 
-    int kmer = kmer2int(index);
-    if(kmer<0)
-        return -1;
+        int kmer = kmer2int(index);
+        if(kmer<0)
+            return -1;
 
-    return mBuf[kmer];
+        return mBuf[kmer];
+    } else {
+        // match longer first
+        for(int l = std::min(mLongestIndex, (int)index.length());  l>= mShortestIndex; l--) {
+            if(l == index.length()) {
+                if(mIndexSample.count(index) >0 ) {
+                    return mIndexSample[index];
+                }
+            } else {
+                string indexPart = index.substr(0, l);
+                if(mIndexSample.count(indexPart) >0 ) {
+                    return mIndexSample[indexPart];
+                }
+            }
+        }
+        return -1;
+    }
 }
 
 int Demuxer::kmer2int(string& str) {
@@ -109,7 +148,7 @@ int Demuxer::kmer2int(string& str) {
         if(val < 0) {
             return -1;
         }
-        kmer = ((kmer<<2) & 0xFFC ) | val;
+        kmer = (kmer<<2) | val;
     }
     return kmer;
 }
@@ -131,7 +170,7 @@ int Demuxer::base2val(char base) {
 
 bool Demuxer::test(){
     Demuxer d(NULL);
-    string s1("CACAAAAA");
+    string s1("AGTCAGAA");
     string s2("ATTCAGAA");
     cout << d.kmer2int(s1) << endl;
     cout << d.kmer2int(s2) << endl;
