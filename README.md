@@ -13,11 +13,11 @@ Use either index1 or index2 to demultiplex a single FASTQ file to multiple FASTQ
 defq -i in.R1.fq -o demux_out_dir -s samplesheet.csv -f .R1.fq
 defq -i in.R2.fq -o demux_out_dir -s samplesheet.csv -f .R2.fq
 ```
-Where samplesheet.csv is 3-column (filename, index1, index2) CSV file. You can use index1 for all samples, or use index2 for all samples, but you cannot use both index1 and index2. An example:
+Where samplesheet.csv is 3-column (filename, index1, index2) CSV file. You can use index1 for all samples, or use index2 for all samples, but you cannot use both index1 and index2. If the indexes have different length, `defq` will match the longer index first, and then match the shorter ones if the read is still not matched. A sample sheet example:
 ```csv
 #filename, #index1, #index2
 file1, ATTCAGAA,
-file2, ATTACTCG,
+file2, ATTACT,
 file3, GAGATTCC,
 file4, CGCTCATT,
 ```
