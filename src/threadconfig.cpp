@@ -1,5 +1,6 @@
 #include "threadconfig.h"
 #include "util.h"
+#include <memory.h>
 
 ThreadConfig::ThreadConfig(Options* opt, int threadId){
     mOptions = opt;

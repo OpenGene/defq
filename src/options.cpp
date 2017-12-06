@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/stat.h>
+#include <string.h>
 
 Options::Options(){
     in1 = "";
