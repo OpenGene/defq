@@ -10,9 +10,12 @@
 SingleEndProcessor::SingleEndProcessor(Options* opt){
     mOptions = opt;
     mProduceFinished = false;
+    mDemuxer = new Demuxer(opt);
+    mSampleSize = mOptions->samples.size();
 }
 
 SingleEndProcessor::~SingleEndProcessor() {
+    delete mDemuxer;
 }
 
 bool SingleEndProcessor::process(){
@@ -20,13 +23,15 @@ bool SingleEndProcessor::process(){
     initPackRepository();
     std::thread producer(std::bind(&SingleEndProcessor::producerTask, this));
 
-    mConfigs = new ThreadConfig*[mOptions->thread];
-    for(int t=0; t<mOptions->thread; t++){
+    int threadnum = mSampleSize + 1;
+
+    mConfigs = new ThreadConfig*[threadnum];
+    for(int t=0; t<threadnum; t++){
         mConfigs[t] = new ThreadConfig(mOptions, t);
     }
 
-    std::thread** threads = new thread*[mOptions->thread];
-    for(int t=0; t<mOptions->thread; t++){
+    std::thread** threads = new thread*[threadnum];
+    for(int t=0; t<threadnum; t++){
         threads[t] = new std::thread(std::bind(&SingleEndProcessor::writeTask, this, mConfigs[t]));
     }
 
@@ -34,12 +39,12 @@ bool SingleEndProcessor::process(){
 
     producer.join();
     demuxer.join();
-    for(int t=0; t<mOptions->thread; t++){
+    for(int t=0; t<threadnum; t++){
         threads[t]->join();
     }
 
     // clean up
-    for(int t=0; t<mOptions->thread; t++){
+    for(int t=0; t<threadnum; t++){
         delete threads[t];
         threads[t] = NULL;
         delete mConfigs[t];
@@ -53,17 +58,28 @@ bool SingleEndProcessor::process(){
 }
 
 bool SingleEndProcessor::processSingleEnd(ReadPack* pack){
-    string outstr;
-    int readPassed = 0;
+    string* outputs = new string[mSampleSize + 1];
     for(int p=0;p<pack->count;p++){
-
-        // original read1
         Read* r = pack->data[p];
+        int sample = mDemuxer->demux(r);
+        // Undetermined
+        if(sample < 0) {
+            sample = mSampleSize;
+        }
+        outputs[sample] += r->toString();
+    }
 
+    for(int i=0;i< mSampleSize+1; i++) {
+        if(outputs[i].size() == 0)
+            continue;
+        char* data = new char[outputs[i].size()];
+        memcpy(data, outputs[i].c_str(), outputs[i].size());
+        mConfigs[i]->input(data, outputs[i].size());
     }
 
     delete pack->data;
     delete pack;
+    delete[] outputs;
 
     return true;
 }
@@ -182,6 +198,10 @@ void SingleEndProcessor::consumerTask()
         std::unique_lock<std::mutex> lock(mRepo.readCounterMtx);
         if(mProduceFinished && mRepo.writePos == mRepo.readPos){
             lock.unlock();
+            // notify all writer threads
+            for(int i=0; i<mSampleSize+1; i++) {
+                mConfigs[i]->setInputCompleted();
+            }
             break;
         }
         if(mProduceFinished){

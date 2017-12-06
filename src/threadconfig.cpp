@@ -15,6 +15,15 @@ ThreadConfig::ThreadConfig(Options* opt, int threadId){
     memset(mRingBuffer, 0, sizeof(char*) * PACK_NUM_LIMIT);
     mRingBufferSizes = new size_t[PACK_NUM_LIMIT];
     memset(mRingBufferSizes, 0, sizeof(size_t) * PACK_NUM_LIMIT);
+
+    string filename = mOptions->umdeterminedFileName;
+    if(mThreadId < mOptions->samples.size())
+        filename = mOptions->samples[mThreadId].file;
+
+    filename += mOptions->suffix1;
+
+    string fullpath = joinpath(mOptions->outFolder, filename);
+    initWriter(fullpath);
 }
 
 ThreadConfig::~ThreadConfig() {

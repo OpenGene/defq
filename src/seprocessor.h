@@ -11,6 +11,7 @@
 #include <thread>
 #include "options.h"
 #include "threadconfig.h"
+#include "demuxer.h"
 
 using namespace std;
 
@@ -55,6 +56,8 @@ private:
     ReadRepository mRepo;
     bool mProduceFinished;
     ThreadConfig** mConfigs;
+    Demuxer* mDemuxer;
+    int mSampleSize;
 };
 
 

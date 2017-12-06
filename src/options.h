@@ -4,23 +4,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <vector>
 
 using namespace std;
 
+class Sample{
+public:
+    string index1;
+    string index2;
+    string file;
+};
 
 class Options{
 public:
     Options();
-    void init();
     bool validate();
 
 public:
     // file name of read1 input
     string in1;
-    // thread number = file number + 1
-    int thread;
     // compression level
     int compression;
+    // sample sheet CSV file
+    string samplesheet;
+    // output folder
+    string outFolder;
+    // undetermined
+    string umdeterminedFileName;
+    // suffix of filename
+    string suffix1;
+    // sample sheet
+    vector<Sample> samples;
+
+private:
+    void parseSampleSheet();
 
 };
 

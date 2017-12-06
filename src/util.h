@@ -41,6 +41,11 @@ inline bool ends_with( string const & value,  string const & ending)
 	return  equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
+inline bool contains( string const & value,  char c)
+{
+    return value.find_first_of(c) != string::npos;
+}
+
 inline string trim(const string& str)
 {
     string::size_type pos = str.find_first_not_of(' ');
