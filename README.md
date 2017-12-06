@@ -5,8 +5,11 @@ Ultra-fast Multi-threaded FASTQ Demultiplexing
 Use either index1 or index2 to demultiplex a single FASTQ file to multiple FASTQ files. This tool is developed in C++ with multi-threading supported.
 
 # simple usage
-```
+```shell
 # read1 and read2 are precessed separately
+# -o specifies the output folder, and current working directory is used by default
+# -f specifies the filename suffix so that R1 / R2 can have different file name
+# -s specifies a samplesheet to defq how to demux
 defq -i in.R1.fq -o demux_out_dir -s samplesheet.csv -f .R1.fq
 defq -i in.R2.fq -o demux_out_dir -s samplesheet.csv -f .R2.fq
 ```
@@ -47,9 +50,14 @@ make
 sudo make install
 ```
 
+# gzip compression
+When the output file name is ended with `.gz`, the output will be compressed with gzip. 
+* If you specify file name suffix by `-f` or `--suffix1`, add `.gz` into the suffix.
+* If you don't specify file name suffix by `-f` or `--suffix1`, add `.gz` into the file name column in samplesheet.csv.
+
 # all options
 ```
-usage: ./defq --in1=string --sample_sheet=string [options] ... 
+usage: defq --in1=string --sample_sheet=string [options] ... 
 options:
   -i, --in1             input file name (string)
   -s, --sample_sheet    a CSV file contains three columns (filename, index1, index2) (string)
