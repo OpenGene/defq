@@ -67,6 +67,7 @@ bool SingleEndProcessor::processSingleEnd(ReadPack* pack){
             sample = mSampleSize;
         }
         outputs[sample] += r->toString();
+        delete r;
     }
 
     for(int i=0;i< mSampleSize+1; i++) {
