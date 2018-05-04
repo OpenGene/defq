@@ -10,8 +10,8 @@ Use either index1 or index2 to demultiplex a single FASTQ file to multiple FASTQ
 # -o specifies the output folder, and current working directory is used by default
 # -f specifies the filename suffix so that R1 / R2 can have different file name
 # -s specifies a samplesheet to defq how to demux
-defq -i in.R1.fq -o demux_out_dir -s samplesheet.csv -f .R1.fq
-defq -i in.R2.fq -o demux_out_dir -s samplesheet.csv -f .R2.fq
+defq -i in.R1.fq.gz -o demux_out_dir -s samplesheet.csv -f .R1.fq.gz
+defq -i in.R2.fq.gz -o demux_out_dir -s samplesheet.csv -f .R2.fq.gz
 ```
 Where samplesheet.csv is 3-column (filename, index1, index2) CSV file. You can use index1 for all samples, or use index2 for all samples, but you cannot use both index1 and index2. If the indexes have different length, `defq` will match the longer index first, and then match the shorter ones if the read is still not matched. A sample sheet example:
 ```csv
@@ -24,16 +24,16 @@ file4, CGCTCATT,
 You will then have following output:
 ```
 demux_out_dir/
-├── Undetermined.R1.fq
-├── Undetermined.R2.fq
-├── file1.R1.fq
-├── file1.R2.fq
-├── file2.R1.fq
-├── file2.R2.fq
-├── file3.R1.fq
-├── file3.R2.fq
-├── file4.R1.fq
-└── file4.R2.fq
+├── Undetermined.R1.fq.gz
+├── Undetermined.R2.fq.gz
+├── file1.R1.fq.gz
+├── file1.R2.fq.gz
+├── file2.R1.fq.gz
+├── file2.R2.fq.gz
+├── file3.R1.fq.gz
+├── file3.R2.fq.gz
+├── file4.R1.fq.gz
+└── file4.R2.fq.gz
 ```
 
 # get defq
