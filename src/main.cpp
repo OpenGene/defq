@@ -27,7 +27,7 @@ int main(int argc, char* argv[]){
     cmd.add<string>("out_folder", 'o', "output folder, default is current working directory", false, ".");
     cmd.add<string>("suffix1", 'f', "the suffix to be appended to the output file name given in sample sheet, default is none", false, "");
     cmd.add<string>("undetermined", 'u', "the file name of undetermined data, default is Undetermined", false, "Undetermined");
-    cmd.add<int>("compression", 'z', "compression level for gzip output (1 ~ 9). 1 is fastest, 9 is smallest, default is 2.", false, 2);
+    cmd.add<int>("compression", 'z', "compression level for gzip output (1 ~ 9). 1 is fastest, 9 is smallest, default is 6.", false, 6);
 
     cmd.parse_check(argc, argv);
     

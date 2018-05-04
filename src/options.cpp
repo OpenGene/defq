@@ -7,7 +7,7 @@
 
 Options::Options(){
     in1 = "";
-    compression = 2;
+    compression = 6;
     umdeterminedFileName = "Undetermined";
 }
 
