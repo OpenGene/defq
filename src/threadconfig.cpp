@@ -1,6 +1,7 @@
 #include "threadconfig.h"
 #include "util.h"
 #include <memory.h>
+#include <unistd.h>
 
 ThreadConfig::ThreadConfig(Options* opt, int threadId){
     mOptions = opt;
@@ -42,6 +43,9 @@ bool ThreadConfig::setInputCompleted() {
 }
 
 void ThreadConfig::output(){
+    if(mOutputCounter >= mInputCounter) {
+        usleep(100);
+    }
     while( mOutputCounter < mInputCounter) 
     {
         long target = mOutputCounter % PACK_NUM_LIMIT;

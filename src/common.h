@@ -27,7 +27,7 @@ typedef unsigned char uint8;
 static const int PACK_NUM_LIMIT  = 1000000;
 
 // how many reads one pack has
-static const int PACK_SIZE = 1000;
+static const int PACK_SIZE = 10000;
 
 // if one pack is produced, but not consumed, it will be kept in the memory
 // this number limit the number of in memory packs
