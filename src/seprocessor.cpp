@@ -199,10 +199,6 @@ void SingleEndProcessor::consumerTask()
         std::unique_lock<std::mutex> lock(mRepo.readCounterMtx);
         if(mProduceFinished && mRepo.writePos == mRepo.readPos){
             lock.unlock();
-            // notify all writer threads
-            for(int i=0; i<mSampleSize+1; i++) {
-                mConfigs[i]->setInputCompleted();
-            }
             break;
         }
         if(mProduceFinished){
@@ -212,6 +208,10 @@ void SingleEndProcessor::consumerTask()
             lock.unlock();
             consumePack();
         }
+    }
+    // notify all writer threads
+    for(int i=0; i<mSampleSize+1; i++) {
+        mConfigs[i]->setInputCompleted();
     }
 }
 
