@@ -219,6 +219,8 @@ void SingleEndProcessor::writeTask(ThreadConfig* config)
 {
     while(true) {
         if(config->isCompleted()){
+            // check one moe time to prevent possible loss of data
+            config->output();
             break;
         }
         config->output();
