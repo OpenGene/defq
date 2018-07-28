@@ -37,7 +37,14 @@ demux_out_dir/
 ```
 
 # get defq
-## compile from source
+## download binary 
+This binary is only for Linux systems: http://opengene.org/defq/defq
+```shell
+# this binary was compiled on CentOS, and tested on CentOS/Ubuntu
+wget http://opengene.org/defq/defq
+chmod a+x ./defq
+```
+## or compile from source
 ```shell
 # get source (you can also use browser to download from master or releases)
 git clone https://github.com/OpenGene/defq.git
@@ -46,7 +53,7 @@ git clone https://github.com/OpenGene/defq.git
 cd defq
 make
 
-# install
+# Install
 sudo make install
 ```
 
